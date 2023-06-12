@@ -3,9 +3,9 @@ flowchart TD
     subgraph Frontend
         Login
         Home
-        Destino-Actividad
-        Informacion-del-entorno
-        Perfil
+        Destiny-Activities
+        environment-information
+        Profile
     end
     subgraph Backend
         subgraph API-Gateway
