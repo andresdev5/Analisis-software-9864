@@ -26,5 +26,4 @@ flowchart TD
     API-Gateway -->|API Calls| Login-&-Register
     API-Gateway -->|API Calls| Search
     API-Gateway -->|API Calls| View-Destiny
-    API-Gateway -->|Caching| Hash-Caching
  ```   
