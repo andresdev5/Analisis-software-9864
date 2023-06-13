@@ -4,6 +4,7 @@ flowchart TD
         Login
         Home
         Destiny-Activities
+        Environment-Information
         Profile
     end
     subgraph Backend
