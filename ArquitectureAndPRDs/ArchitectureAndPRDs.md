@@ -20,9 +20,6 @@ flowchart TD
         subgraph Primary-database
             Save-data
         end
-        subgraph Redis
-            Hash-Caching
-        end
     end
     Frontend -->|HTTP Requests| API-Gateway
     API-Gateway -->|CRUD| Primary-database
