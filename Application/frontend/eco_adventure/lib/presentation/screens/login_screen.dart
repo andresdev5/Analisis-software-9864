@@ -103,6 +103,7 @@ class _LoginFormState extends State<_LoginForm> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Ingresado correctamente')),
       );
+      context.replace('/home');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No se pudo autentificar')),
@@ -171,7 +172,6 @@ class _LoginFormState extends State<_LoginForm> {
                   var password = _password.value.text;
 
                   await login(context, username, password);
-                  context.replace('/home');
                 }
               },
               child: const Text(

@@ -3,6 +3,7 @@ import 'package:eco_adventure/presentation/screens/home_screen.dart';
 import 'package:eco_adventure/presentation/screens/login_screen.dart';
 import 'package:eco_adventure/presentation/screens/register_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 final GoRouter _router = GoRouter(
@@ -36,7 +37,15 @@ final GoRouter _router = GoRouter(
   ],
 );
 
-void main() => runApp(const MainApp());
+void main() {
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Color.fromARGB(255, 22, 160, 133),
+    ),
+  );
+
+  return runApp(const MainApp());
+}
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
@@ -46,6 +55,9 @@ class MainApp extends StatelessWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       routerConfig: _router,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      )
     );
   }
 }
