@@ -25,4 +25,5 @@ flowchart TD
     API-Gateway -->|API Calls| hoteles
     API-Gateway -->|API Calls| clientes
     API-Gateway -->|API Calls| habitaciones
+    API-Gateway -->|API Calls| reservacion
  ```   
