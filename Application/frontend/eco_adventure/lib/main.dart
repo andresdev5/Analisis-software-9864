@@ -1,10 +1,14 @@
+import 'package:eco_adventure/presentation/providers/auth_provider.dart';
+import 'package:eco_adventure/presentation/providers/user_provider.dart';
 import 'package:eco_adventure/presentation/screens/auth_screen.dart';
 import 'package:eco_adventure/presentation/screens/home_screen.dart';
 import 'package:eco_adventure/presentation/screens/login_screen.dart';
+import 'package:eco_adventure/presentation/screens/profile_screen.dart';
 import 'package:eco_adventure/presentation/screens/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 final GoRouter _router = GoRouter(
   routes: <RouteBase>[
@@ -31,6 +35,12 @@ final GoRouter _router = GoRouter(
           builder: (BuildContext context, GoRouterState state) {
             return const HomeScreen();
           },
+        ),
+        GoRoute(
+          path: 'profile',
+          builder: (BuildContext context, GoRouterState state) {
+            return const ProfileScreen();
+          },
         )
       ],
     ),
@@ -44,7 +54,15 @@ void main() {
     ),
   );
 
-  return runApp(const MainApp());
+  return runApp(MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProxyProvider<AuthProvider, UserProvider>(
+          create: (_) => UserProvider(),
+          update: (_, authProvider, userProvider) => UserProvider(authProvider: authProvider))
+      ],
+      child: const MainApp(),
+    ),);
 }
 
 class MainApp extends StatelessWidget {

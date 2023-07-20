@@ -3,23 +3,32 @@ const jsonwebtoken = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 async function login(req, res) {
-    const { username, password } = req.body;
+    const { username, email, password } = req.body;
 
-    if (!username || !password) {
+    if (!username && !email) {
         return res.status(400).json({
-            message: 'Username and password are required',
+            message: 'Username or email are required',
+        });
+    }
+
+    if (!password) {
+        return res.status(400).json({
+            message: 'Password is required',
         });
     }
 
     const hashedPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
     const data = await Database.instance.connection.any(
-        'SELECT id, username, email, role_id, password FROM public.user WHERE username = $1', 
-        [username, hashedPassword]
+        `SELECT u.id, u.username, u.email, u.role_id, u.password, r.name as role_name
+         FROM public.user as u
+         LEFT JOIN public.role r ON u.role_id = r.id
+         WHERE ${username ? 'username' : 'email'} = $1`, 
+        [username ? username : email, hashedPassword]
     );
 
     if (data.length === 0) {
         return res.status(400).json({
-            message: 'Username not found',
+            message: 'User not found',
         });
     }
 
@@ -31,14 +40,25 @@ async function login(req, res) {
         });
     }
 
+    const userData = {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: {
+            id: user.role_id,
+            name: user.role_name,
+        }
+    };
+
     const token = jsonwebtoken.sign({
-        data: user,
+        data: userData,
         hash: bcrypt.hashSync(password, bcrypt.genSaltSync(10)),
     }, process.env.JWT_SECRET, { expiresIn: '31d' });
 
     return res.status(200).json({
         message: 'Login successful',
-        token: token
+        token: token,
+        user: userData,
     });
 }
 
@@ -53,19 +73,24 @@ async function register(req, res) {
 
     const hashedPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
-    const data = await Database.instance.connection.one(
-        'SELECT MAX(id) as id FROM public.user'
+    await Database.instance.connection.none(
+        'INSERT INTO public.user(username, email, password, role_id) VALUES($1, $2, $3, 2)',
+        [username, email, hashedPassword]
     );
 
-    const id = data.id + 1;
+    const inserted = await Database.instance.connection.one(
+        'SELECT id FROM public.user WHERE username = $1 LIMIT 1',
+        [username]
+    );
+    const userId = inserted.id;
 
-    Database.instance.connection.none(
-        'INSERT INTO public.user(id, username, email, password, role_id) VALUES($1, $2, $3, $4, 2)',
-        [id, username, email, hashedPassword]
+    await Database.instance.connection.none(
+        'INSERT INTO public.user_profile(user_id) VALUES($1)',
+        [userId]
     );
 
     return res.status(200).json({
-        message: 'Register successful',
+        message: 'Registered successfully',
     });
 }
 

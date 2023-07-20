@@ -1,8 +1,11 @@
+import 'package:eco_adventure/presentation/models/user_model.dart';
+import 'package:eco_adventure/presentation/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -13,13 +16,16 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-  var _username = 'username';
+  AuthProvider? _authProvider;
 
-  void _onItemTapped(int index) {
-    setState(() {
+  Future<void> _onItemTapped(BuildContext context, int index) async {
+    setState(() async {
       _selectedIndex = index;
 
       if (index == 4) {
+        context.go('/profile');
+      } else if (index == 5) {
+        await _authProvider?.logout();
         context.replace('/');
       }
     });
@@ -29,22 +35,29 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var user = context.watch<AuthProvider>().user;
+
     return Scaffold(
       appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          title: const Padding(
-            padding: EdgeInsets.only(top: 18.0, bottom: 18.0),
+          title: Padding(
+            padding: const EdgeInsets.only(top: 18.0, bottom: 18.0),
             child: Flex(
               direction: Axis.horizontal,
               children: [
                 Row(
                   children: [
-                    Icon(Icons.account_circle,
-                        color: Color.fromARGB(255, 22, 160, 133), size: 48),
-                    SizedBox(width: 10),
-                    Text('Welcome',
-                        style: TextStyle(
+                    IconButton(
+                        onPressed: () {
+                          context.go('/profile');
+                        },
+                        icon: Icon(Icons.account_circle,
+                            color: Color.fromARGB(255, 22, 160, 133),
+                            size: 48)),
+                    const SizedBox(width: 10),
+                    Text('Welcome ${user?.username ?? ''}',
+                        style: const TextStyle(
                           color: Colors.black,
                           fontSize: 18,
                         )),
@@ -77,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               style: TextStyle(
                                   fontSize: 14, color: Colors.black54)),
                         ],
-                      ),
+                      ), // ecoadventure2023
                       const SizedBox(height: 40),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -268,90 +281,148 @@ class _HomeScreenState extends State<HomeScreen> {
                                           fontWeight: FontWeight.bold)),
                                   const SizedBox(height: 10),
                                   SizedBox(
-                                    height: 400, 
-                                    child: ListView(
-                                    children: [
-                                      ListTile(
-                                        contentPadding:EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                                        tileColor: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                          side: BorderSide(color: Colors.black12, width: 1),
-                                          borderRadius: BorderRadius.circular(5),
-                                        ), 
-                                        leading: const Icon(Icons.person),
-                                        title: const Text('GPAguirre3', style: TextStyle(fontWeight: FontWeight.bold),),
-                                        subtitle: const Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            SizedBox(height: 10),
-                                            Text('A beautiful place to visit, I recommend it.'),
-                                            SizedBox(height: 10),
-                                            Row(
-                                              children: [
-                                                Text('Visited place:', style: TextStyle(fontWeight: FontWeight.bold),),
-                                                SizedBox(width: 5),
-                                                Icon(Icons.place, color: Colors.red, size: 20),
-                                                SizedBox(width: 2),
-                                                Text('Quilotoa Lagoon'),
-                                              ]
+                                      height: 400,
+                                      child: ListView(
+                                        children: [
+                                          ListTile(
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                                    vertical: 8.0,
+                                                    horizontal: 16.0),
+                                            tileColor: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                              side: const BorderSide(
+                                                  color: Colors.black12,
+                                                  width: 1),
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
                                             ),
-                                            SizedBox(height: 1),
-                                            Row(
-                                              children: [
-                                                Text('Score:', style: TextStyle(fontWeight: FontWeight.bold),),
-                                                SizedBox(width: 5),
-                                                Icon(Icons.star, color: Colors.yellow, size: 20),
-                                                Icon(Icons.star, color: Colors.yellow, size: 20),
-                                                Icon(Icons.star, color: Colors.yellow, size: 20),
-                                                Icon(Icons.star, color: Colors.yellow, size: 20),
-                                                Icon(Icons.star, color: Colors.yellow, size: 20),
-                                              ]
-                                            )
-                                          ]
-                                        ),
-                                      ),
-                                      SizedBox(height: 10),
-                                      ListTile(
-                                        contentPadding:EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                                        tileColor: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                          side: BorderSide(color: Colors.black12, width: 1),
-                                          borderRadius: BorderRadius.circular(5),
-                                        ), 
-                                        leading: const Icon(Icons.person),
-                                        title: const Text('White', style: TextStyle(fontWeight: FontWeight.bold),),
-                                        subtitle: const Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            SizedBox(height: 10),
-                                            Text('I was amazed by the beauty of this place, I will definitely return.'),
-                                            SizedBox(height: 10),
-                                            Row(
-                                              children: [
-                                                Text('Visited place:', style: TextStyle(fontWeight: FontWeight.bold),),
-                                                SizedBox(width: 5),
-                                                Icon(Icons.place, color: Colors.red, size: 20),
-                                                SizedBox(width: 2),
-                                                Text('Peguche Waterfall'),
-                                              ]
+                                            leading: const Icon(Icons.person),
+                                            title: const Text(
+                                              'GPAguirre3',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold),
                                             ),
-                                            SizedBox(height: 1),
-                                            Row(
-                                              children: [
-                                                Text('Score:', style: TextStyle(fontWeight: FontWeight.bold),),
-                                                SizedBox(width: 5),
-                                                Icon(Icons.star, color: Colors.yellow, size: 20),
-                                                Icon(Icons.star, color: Colors.yellow, size: 20),
-                                                Icon(Icons.star, color: Colors.yellow, size: 20),
-                                                Icon(Icons.star, color: Colors.yellow, size: 20),
-                                                Icon(Icons.star, color: Colors.grey, size: 20),
-                                              ]
-                                            )
-                                          ]
-                                        ),
-                                      ),
-                                    ],
-                                  ))
+                                            subtitle: const Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  SizedBox(height: 10),
+                                                  Text(
+                                                      'A beautiful place to visit, I recommend it.'),
+                                                  SizedBox(height: 10),
+                                                  Row(children: [
+                                                    Text(
+                                                      'Visited place:',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    SizedBox(width: 5),
+                                                    Icon(Icons.place,
+                                                        color: Colors.red,
+                                                        size: 20),
+                                                    SizedBox(width: 2),
+                                                    Text('Quilotoa Lagoon'),
+                                                  ]),
+                                                  SizedBox(height: 1),
+                                                  Row(children: [
+                                                    Text(
+                                                      'Score:',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    SizedBox(width: 5),
+                                                    Icon(Icons.star,
+                                                        color: Colors.yellow,
+                                                        size: 20),
+                                                    Icon(Icons.star,
+                                                        color: Colors.yellow,
+                                                        size: 20),
+                                                    Icon(Icons.star,
+                                                        color: Colors.yellow,
+                                                        size: 20),
+                                                    Icon(Icons.star,
+                                                        color: Colors.yellow,
+                                                        size: 20),
+                                                    Icon(Icons.star,
+                                                        color: Colors.yellow,
+                                                        size: 20),
+                                                  ])
+                                                ]),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          ListTile(
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                                    vertical: 8.0,
+                                                    horizontal: 16.0),
+                                            tileColor: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                              side: const BorderSide(
+                                                  color: Colors.black12,
+                                                  width: 1),
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                            ),
+                                            leading: const Icon(Icons.person),
+                                            title: const Text(
+                                              'White',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            subtitle: const Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  SizedBox(height: 10),
+                                                  Text(
+                                                      'I was amazed by the beauty of this place, I will definitely return.'),
+                                                  SizedBox(height: 10),
+                                                  Row(children: [
+                                                    Text(
+                                                      'Visited place:',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    SizedBox(width: 5),
+                                                    Icon(Icons.place,
+                                                        color: Colors.red,
+                                                        size: 20),
+                                                    SizedBox(width: 2),
+                                                    Text('Peguche Waterfall'),
+                                                  ]),
+                                                  SizedBox(height: 1),
+                                                  Row(children: [
+                                                    Text(
+                                                      'Score:',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    SizedBox(width: 5),
+                                                    Icon(Icons.star,
+                                                        color: Colors.yellow,
+                                                        size: 20),
+                                                    Icon(Icons.star,
+                                                        color: Colors.yellow,
+                                                        size: 20),
+                                                    Icon(Icons.star,
+                                                        color: Colors.yellow,
+                                                        size: 20),
+                                                    Icon(Icons.star,
+                                                        color: Colors.yellow,
+                                                        size: 20),
+                                                    Icon(Icons.star,
+                                                        color: Colors.grey,
+                                                        size: 20),
+                                                  ])
+                                                ]),
+                                          ),
+                                        ],
+                                      ))
                                 ])
                           ])
                     ],
@@ -382,6 +453,10 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Settings',
           ),
           BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle),
+            label: 'Profile',
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.logout),
             label: 'Logout',
           ),
@@ -389,7 +464,7 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex: _selectedIndex,
         selectedItemColor: const Color.fromARGB(255, 22, 160, 133),
         unselectedItemColor: const Color.fromARGB(255, 48, 54, 63),
-        onTap: _onItemTapped,
+        onTap: (index) => _onItemTapped(context, index),
         selectedLabelStyle: const TextStyle(fontSize: 14),
       ),
     );

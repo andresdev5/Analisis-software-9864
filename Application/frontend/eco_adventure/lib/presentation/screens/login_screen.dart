@@ -1,8 +1,11 @@
 import 'dart:convert';
 
+import 'package:eco_adventure/presentation/models/auth_credential.dart';
+import 'package:eco_adventure/presentation/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -78,35 +81,20 @@ class _LoginFormState extends State<_LoginForm> {
   final _username = TextEditingController();
   final _password = TextEditingController();
 
-  Future<void> login(
-      BuildContext context, String username, String password) async {
+  Future<void> login(BuildContext context, String username, String password) async {
     try {
-      final response =
-          await http.post(Uri.parse('http://10.0.2.2:3000/auth/login'),
-              headers: <String, String>{
-                'Content-Type': 'application/json; charset=UTF-8',
-              },
-              body: jsonEncode(<String, String>{
-                'username': username,
-                'password': password,
-              }));
+      var authProvider = context.read<AuthProvider>();
+      var loggedIn = await authProvider
+          .login(AuthCredential(username: username, password: password));
 
-      if (response.statusCode != 200) {
-        final json = jsonDecode(response.body);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(json['message'] as String)),
-        );
-
-        return;
+      if (loggedIn) {
+        context.replace('/home');
+      } else {
+        throw Exception('Invalid credentials');
       }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingresado correctamente')),
-      );
-      context.replace('/home');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No se pudo autentificar')),
+        SnackBar(content: Text(e.toString())),
       );
 
       print(e);

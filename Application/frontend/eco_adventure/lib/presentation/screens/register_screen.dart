@@ -1,8 +1,12 @@
 import 'dart:convert';
 
+import 'package:eco_adventure/presentation/models/auth_credential.dart';
+import 'package:eco_adventure/presentation/models/user_model.dart';
+import 'package:eco_adventure/presentation/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -76,35 +80,13 @@ class _RegisterFormState extends State<_RegisterForm> {
   final _password = TextEditingController();
   final _password2 = TextEditingController();
 
-  Future<void> register(BuildContext context, String username, String password,
-      String email) async {
+  Future<void> register(BuildContext context, String username, String password, String email) async {
     try {
-      final response =
-          await http.post(Uri.parse('http://10.0.2.2:3000/auth/register'),
-              headers: <String, String>{
-                'Content-Type': 'application/json; charset=UTF-8',
-              },
-              body: jsonEncode(<String, String>{
-                'username': username,
-                'email': email,
-                'password': password,
-              }));
-
-      if (response.statusCode != 200) {
-        final json = jsonDecode(response.body);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(json['message'] as String)),
-        );
-
-        return;
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registrado correctamente')),
-      );
+      var authProvider = context.read<AuthProvider>();
+      await authProvider.register(User(username: username, email: email, password: password));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No se pudo registrar')),
+        SnackBar(content: Text(e.toString())),
       );
 
       print(e);
