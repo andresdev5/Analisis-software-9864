@@ -1,6 +1,8 @@
 import 'package:eco_adventure/presentation/providers/auth_provider.dart';
+import 'package:eco_adventure/presentation/providers/location_provider.dart';
 import 'package:eco_adventure/presentation/providers/user_provider.dart';
 import 'package:eco_adventure/presentation/screens/auth_screen.dart';
+import 'package:eco_adventure/presentation/screens/edit_profile_screen.dart';
 import 'package:eco_adventure/presentation/screens/home_screen.dart';
 import 'package:eco_adventure/presentation/screens/login_screen.dart';
 import 'package:eco_adventure/presentation/screens/profile_screen.dart';
@@ -41,7 +43,13 @@ final GoRouter _router = GoRouter(
           builder: (BuildContext context, GoRouterState state) {
             return const ProfileScreen();
           },
-        )
+        ),
+        GoRoute(
+          path: 'profile-edit',
+          builder: (BuildContext context, GoRouterState state) {
+            return const EditProfileScreen();
+          },
+        ),
       ],
     ),
   ],
@@ -59,7 +67,10 @@ void main() {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProxyProvider<AuthProvider, UserProvider>(
           create: (_) => UserProvider(),
-          update: (_, authProvider, userProvider) => UserProvider(authProvider: authProvider))
+          update: (_, authProvider, userProvider) => UserProvider(authProvider: authProvider)),
+        ChangeNotifierProxyProvider<AuthProvider, LocationProvider>(
+          create: (_) => LocationProvider(),
+          update: (_, authProvider, userProvider) => LocationProvider(authProvider: authProvider)),
       ],
       child: const MainApp(),
     ),);

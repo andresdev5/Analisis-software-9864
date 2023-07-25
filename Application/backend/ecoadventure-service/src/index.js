@@ -13,6 +13,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const unauthorizedPaths = [
+    '/auth/login', 
+    '/auth/register', 
+    '/location/countries'
+];
+
 // token middleware
 app.use(jwt({
     secret: process.env.JWT_SECRET,
@@ -24,11 +30,13 @@ app.use(jwt({
 
         return null;
     }
-}).unless({ path: ['/auth/login', '/auth/register'] }));
+}).unless({ 
+    path: unauthorizedPaths
+}));
 
 // set decode user to req.user except login and register
 app.use((req, res, next) => {
-    if (req.path === '/auth/login' || req.path === '/auth/register') {
+    if (unauthorizedPaths.includes(req.path)) {
         return next();
     }
 
@@ -55,6 +63,7 @@ app.use((req, res, next) => {
 
 app.use('/auth', require('./routes/auth.route'));
 app.use('/user', require('./routes/user.route'));
+app.use('/location', require('./routes/location.route'));
 
 app.listen(3000, () => {
     console.log('Server running on port 3000');

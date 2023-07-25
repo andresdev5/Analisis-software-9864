@@ -7,10 +7,25 @@ class Country {
     this.name,
   });
 
+  @override
+  int get hashCode => code.hashCode;
+
+  @override
+  bool operator ==(Object other) => other is Country && other.code == code;
+
+  // to string
+  @override
+  String toString() => name ?? '';
+
   static fromJson(data) => Country(
-    code: data['code'],
-    name: data['name'],
-  );
+        code: data['code'],
+        name: data['name'],
+      );
+
+  Map<String, dynamic> toJson() => {
+    'code': code,
+    'name': name,
+  };
 }
 
 class City {
@@ -25,8 +40,8 @@ class City {
   });
 
   static fromJson(data) => City(
-    id: data['id'],
-    code: data['code'],
-    name: data['name'],
-  );
+        id: data['id'],
+        code: data['code'],
+        name: data['name'],
+      );
 }

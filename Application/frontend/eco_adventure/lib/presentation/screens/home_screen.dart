@@ -41,28 +41,22 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
+          leading: IconButton(
+              onPressed: () {
+                context.go('/profile');
+              },
+              icon: Icon(Icons.account_circle,
+                  color: Color.fromARGB(255, 22, 160, 133), size: 48)),
           title: Padding(
-            padding: const EdgeInsets.only(top: 18.0, bottom: 18.0),
+            padding: const EdgeInsets.only(top: 24.0, bottom: 18.0),
             child: Flex(
               direction: Axis.horizontal,
               children: [
-                Row(
-                  children: [
-                    IconButton(
-                        onPressed: () {
-                          context.go('/profile');
-                        },
-                        icon: Icon(Icons.account_circle,
-                            color: Color.fromARGB(255, 22, 160, 133),
-                            size: 48)),
-                    const SizedBox(width: 10),
-                    Text('Welcome ${user?.username ?? ''}',
+                Text('Welcome ${user?.username ?? ''}',
                         style: const TextStyle(
                           color: Colors.black,
                           fontSize: 18,
                         )),
-                  ],
-                ),
               ],
             ),
           )),

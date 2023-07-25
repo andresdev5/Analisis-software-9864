@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:flutter_map/flutter_map.dart';
+import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
@@ -32,18 +33,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     context.read<UserProvider>().getProfile();
 
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 245, 245, 245),
       body: FutureBuilder<UserProfile>(
           future: context.read<UserProvider>().getProfile(),
           builder: (BuildContext context, AsyncSnapshot<UserProfile> snapshot) {
             var profile = snapshot.data;
 
             if (snapshot.connectionState == ConnectionState.done) {
-              if (snapshot.hasError) {
-                print('PROFILE ERROR ' + snapshot.error.toString());
-                return Container(child: Text('Error'));
-              }
-
-              print('PROFILE!: ${profile}');
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -56,7 +52,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            margin: EdgeInsets.only(left: 25),
+                            margin: const EdgeInsets.only(left: 25),
                             child: Text(
                               (profile?.firstname ?? (user?.username ?? '')),
                               style: Theme.of(context)
@@ -66,101 +62,244 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          // phone with label and below value
-                          Row(
-                            children: [
-                              Container(
-                                margin: EdgeInsets.only(left: 25),
-                                child: Text(
-                                  'Nombre',
-                                  style: Theme.of(context).textTheme.bodyText1,
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Text(
-                                (profile?.firstname ?? ''),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyText1
-                                    ?.copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .secondary),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          // phone with label and below value
-                          Row(
-                            children: [
-                              Container(
-                                margin: EdgeInsets.only(left: 25),
-                                child: Text(
-                                  'Apellido',
-                                  style: Theme.of(context).textTheme.bodyText1,
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Text(
-                                (profile?.lastname ?? ''),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyText1
-                                    ?.copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .secondary),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          // email with label and below value
-                          Row(
-                            children: [
-                              Container(
-                                margin: EdgeInsets.only(left: 25),
-                                child: Text(
-                                  'Email',
-                                  style: Theme.of(context).textTheme.bodyText1,
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Text(
-                                (user?.email ?? ''),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyText1
-                                    ?.copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .secondary),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          // phone with label and below value
-                          Row(
-                            children: [
-                              Container(
-                                margin: EdgeInsets.only(left: 25),
-                                child: Text(
-                                  'Phone',
-                                  style: Theme.of(context).textTheme.bodyText1,
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Text(
-                                (profile?.phone ?? ''),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyText1
-                                    ?.copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .secondary),
-                              ),
-                            ],
-                          ),
+                          Flexible(
+                            child: ListView(
+                              children: [
+                                Container(
+                                    // white box, border 1 px gray, rounded corners, shadow
+                                    margin: const EdgeInsets.only(
+                                        left: 25, right: 25, bottom: 25),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16, horizontal: 16),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .scaffoldBackgroundColor,
+                                      border: Border.all(
+                                          color: Colors.grey.shade300),
+                                      borderRadius: BorderRadius.circular(4),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.1),
+                                          spreadRadius: 0,
+                                          blurRadius: 1,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const Text('Personal Information',
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w600)),
+                                          const SizedBox(height: 16),
+                                          Flex(
+                                            direction: Axis.horizontal,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Container(
+                                                child: const Text(
+                                                  'Name',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Color.fromARGB(
+                                                          255, 153, 163, 177)),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 16),
+                                              Text(
+                                                (profile?.firstname ?? ''),
+                                                style: const TextStyle(
+                                                    fontSize: 16,
+                                                    color: Colors.black),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Flex(
+                                            direction: Axis.horizontal,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Container(
+                                                child: const Text(
+                                                  'Lastname',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Color.fromARGB(
+                                                          255, 153, 163, 177)),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 16),
+                                              Text(
+                                                (profile?.lastname ?? ''),
+                                                style: const TextStyle(
+                                                    fontSize: 16,
+                                                    color: Colors.black),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Flex(
+                                            direction: Axis.horizontal,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Container(
+                                                child: const Text(
+                                                  'Email',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Color.fromARGB(
+                                                          255, 153, 163, 177)),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 16),
+                                              Text(
+                                                (user?.email ?? ''),
+                                                style: const TextStyle(
+                                                    fontSize: 16,
+                                                    color: Colors.black),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Flex(
+                                            direction: Axis.horizontal,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Container(
+                                                child: const Text(
+                                                  'Phone',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Color.fromARGB(
+                                                          255, 153, 163, 177)),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 16),
+                                              Text(
+                                                (profile?.phone ?? '-'),
+                                                style: const TextStyle(
+                                                    fontSize: 16,
+                                                    color: Colors.black),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Flex(
+                                            direction: Axis.horizontal,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Container(
+                                                child: const Text(
+                                                  'Birthday',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Color.fromARGB(
+                                                          255, 153, 163, 177)),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 16),
+                                              Text(
+                                                profile != null && profile.birthday != null
+                                                  ? DateFormat('yyyy-MM-dd').format(profile.birthday!)
+                                                  : '-',
+                                                style: const TextStyle(
+                                                    fontSize: 16,
+                                                    color: Colors.black),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Flex(
+                                            direction: Axis.horizontal,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Container(
+                                                child: const Text(
+                                                  'Location',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Color.fromARGB(
+                                                          255, 153, 163, 177)),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 16),
+                                              Text(
+                                                (profile?.country?.name ?? '-'),
+                                                style: const TextStyle(
+                                                    fontSize: 16,
+                                                    color: Colors.black),
+                                              ),
+                                            ],
+                                          ),
+                                        ])),
+                                Container(
+                                    // white box, border 1 px gray, rounded corners, shadow
+                                    margin: const EdgeInsets.only(
+                                        left: 25, right: 25, bottom: 25),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16, horizontal: 16),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .scaffoldBackgroundColor,
+                                      border: Border.all(
+                                          color: Colors.grey.shade300),
+                                      borderRadius: BorderRadius.circular(4),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.1),
+                                          spreadRadius: 0,
+                                          blurRadius: 1,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const Text('About',
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w600)),
+                                          const SizedBox(height: 16),
+                                          Flex(
+                                            direction: Axis.horizontal,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                profile?.about ?? '-',
+                                                style: const TextStyle(
+                                                    fontSize: 16,
+                                                    color: Color.fromARGB(255, 59, 68, 80)),
+                                              ),
+                                            ],
+                                          ),
+                                        ]))
+                              ],
+                            ),
+                          )
                         ],
                       ),
                     ),
@@ -224,7 +363,7 @@ class _TopPortion extends StatelessWidget {
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
                   colors: [
-                    Color.fromARGB(255, 22, 160, 133),
+                    Color.fromARGB(215, 22, 160, 133),
                     Color.fromARGB(255, 22, 160, 133)
                   ]),
               borderRadius: BorderRadius.only(
@@ -241,32 +380,41 @@ class _TopPortion extends StatelessWidget {
               fit: StackFit.expand,
               children: [
                 Container(
-                  margin: EdgeInsets.only(left: 25),
-                  decoration: const BoxDecoration(
+                  margin: const EdgeInsets.only(left: 25),
+                  decoration: BoxDecoration(
                     color: Colors.black,
+                    boxShadow: null,
                     shape: BoxShape.circle,
-                    image: DecorationImage(
+                    border: Border.all(color: const Color.fromARGB(255, 245, 245, 245), width: 5),
+                    image: const DecorationImage(
                         fit: BoxFit.cover,
                         image: NetworkImage('https://i.imgur.com/N0zWv1L.png')),
                   ),
                 ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: CircleAvatar(
-                    radius: 20,
-                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                    child: Container(
-                      margin: const EdgeInsets.all(8.0),
-                      decoration: const BoxDecoration(
-                          color: Colors.green, shape: BoxShape.circle),
-                    ),
-                  ),
-                )
               ],
             ),
           ),
-        )
+        ),
+        // dots button with dropdown menu
+        Align(
+          alignment: Alignment.topRight,
+          child: Container(
+            margin: const EdgeInsets.only(top: 50, right: 25),
+            child: PopupMenuButton(
+              icon: const Icon(Icons.more_vert, color: Colors.white),
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  child: TextButton(
+                    onPressed: () {
+                      context.go('/profile-edit');
+                    },
+                    child: const Text('Edit Profile', style: TextStyle(color: Colors.black)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }
