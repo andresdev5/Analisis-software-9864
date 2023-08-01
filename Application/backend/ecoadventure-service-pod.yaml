@@ -1,0 +1,41 @@
+#For creating the Kubernetes Deployment in the Minikube cluster
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecoadventure-admin-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ecoadventure-admin-service
+  template:
+    metadata:
+      labels:
+        app: ecoadventure-admin-service
+    spec:
+      containers:
+      - name: ecoadventure-admin-service
+        image: ksprwhite/ecoadventure-admin-service
+        resources:
+          limits:
+            cpu: 2
+            memory: 1Gi
+          requests:
+            cpu: 1
+            memory: 512Mi
+        ports:
+        - containerPort: 8080
+---
+#For creating the Kubernetes Service in the Minikube cluster
+apiVersion: v1
+kind: Service
+metadata:
+  name: ecoadventure-admin-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: ecoadventure-admin-service
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080

@@ -2,11 +2,17 @@ var pgp = require("pg-promise")({
     schema: 'public'
 });
 
-const db = pgp('postgres://postgres:postgres@localhost:5432/ecoadventure');
+const {
+    DB_USER,
+    DB_PASSWORD,
+    DB_HOST,
+    DB_PORT,
+    DB_NAME
+} = process.env;
 
+const db = pgp(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`);
 
 // singleton database
-
 class Database {
     #_connection = null;
     static #instance = null;
@@ -31,15 +37,14 @@ class Database {
         try {
             this.#_connection = await db.connect();
             console.log('Database connected');
+            return true;
         } catch (error) {
             console.log('Database connection failed');
             console.log(error);
+            return false;
         }
     }
 }
-
-Database.instance.connect();
-
 
 module.exports = {
     Database

@@ -252,7 +252,7 @@ class _EditProfileFormState extends State<_EditProfileForm> {
     var countries = [];
 
     for (var country in data) {
-      countries.add(Country(code: country.code, name: country.name));
+      //countries.add(Country(code: country.code, name: country.name));
     }
 
     setState(() {
@@ -273,6 +273,7 @@ class _EditProfileFormState extends State<_EditProfileForm> {
     _phone.text = widget._profile.phone ?? '';
     _about.text = widget._profile.about ?? '';
     _birthday = widget._profile.birthday ?? DateTime.now();
+    _country = widget._profile.country;
 
     return Form(
         key: _formKey,

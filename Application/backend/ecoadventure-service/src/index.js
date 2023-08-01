@@ -6,6 +6,7 @@ const express = require('express');
 const cors = require('cors');
 const { expressjwt: jwt } = require('express-jwt');
 const jsonwebtoken = require('jsonwebtoken');
+const { Database } = require('./core/database');
 
 const app = express();
 
@@ -65,6 +66,17 @@ app.use('/auth', require('./routes/auth.route'));
 app.use('/user', require('./routes/user.route'));
 app.use('/location', require('./routes/location.route'));
 
-app.listen(3000, () => {
-    console.log('Server running on port 3000');
-});
+async function main() {
+    const connected = await Database.instance.connect();
+
+    if (!connected) {
+        console.log('Server failed to start');
+        return;
+    }
+
+    app.listen(3000, () => {
+        console.log('Server running on port 3000');
+    });
+}
+
+main();

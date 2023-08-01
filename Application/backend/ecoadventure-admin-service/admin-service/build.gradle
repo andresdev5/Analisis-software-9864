@@ -1,0 +1,64 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+    id 'org.springframework.boot' version '3.1.2'
+    id 'io.spring.dependency-management' version '1.1.2'
+    id 'org.jetbrains.kotlin.jvm' version '1.8.22'
+    id 'org.jetbrains.kotlin.plugin.spring' version '1.8.22'
+    id 'org.jetbrains.kotlin.plugin.jpa' version '1.8.22'
+}
+
+apply plugin: 'java'
+
+group = 'ec.edu.espe.ecoadventure'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '17'
+}
+
+sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.security:spring-security-oauth2-jose'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
+    implementation 'org.jetbrains.kotlin:kotlin-reflect'
+    implementation 'org.liquibase:liquibase-core'
+    implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.1.1'
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.withType(KotlinCompile) {
+    kotlinOptions {
+        freeCompilerArgs += '-Xjsr305=strict'
+        jvmTarget = '17'
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

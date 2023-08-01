@@ -1,0 +1,17 @@
+version: "3"
+services:
+  ecoadventure-service:
+    environment:
+      - NODE_ENV=production
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    container_name: ecoadventure-service
+    expose:
+      - "3000"
+    ports:
+      - "3000:3000"
+    command: npm run start
