@@ -185,7 +185,6 @@ class _PlaceScreenState extends State<PlaceScreen> {
                                               scrollDirection: Axis.vertical,
                                               itemCount: reviews.length,
                                               itemBuilder: (context, index) {
-                                                index = 0;
                                                 return Card(
                                                   margin: const EdgeInsets.only(bottom: 5.0),
                                                   child: Padding(
