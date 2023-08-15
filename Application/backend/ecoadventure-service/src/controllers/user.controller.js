@@ -37,12 +37,12 @@ async function getUser(req, res) {
 async function getProfile(req, res) {
     const data = await Database.instance.connection.any(`
         SELECT u.id, u.username, u.email, up.firstname, up.lastname, up.about, up.birthday, up.phone,
-               up.avatar, c.code AS country_code, c.name AS country_name, r.id as role_id, r.name AS role_name,
+               up.avatar, c.id AS city_id, c.name AS city_name, r.id as role_id, r.name AS role_name,
                r.description AS role_description
         FROM public.user u
         LEFT JOIN public.role r ON u.role_id = r.id
         LEFT JOIN public.user_profile up ON u.id = up.user_id
-        LEFT JOIN public.country c ON up.country_code = c.code
+        LEFT JOIN public.city c ON up.city_id = c.id
         WHERE u.id = $1
     `, [req.user.id]);
 
@@ -71,9 +71,9 @@ async function getProfile(req, res) {
             birthday: row.birthday,
             phone: row.phone,
             avatar: row.avatar,
-            country: {
-                code: row.country_code,
-                name: row.country_name
+            city: {
+                id: row.city_id,
+                name: row.city_name
             }
         }
     };
@@ -100,9 +100,9 @@ async function getProfile(req, res) {
                 birthday: row.birthday,
                 phone: row.phone,
                 avatar: row.avatar,
-                country: {
-                    code: row.country_code,
-                    name: row.country_name
+                city: {
+                    id: row.city_id,
+                    name: row.city_name
                 }
             }
         },
@@ -112,8 +112,8 @@ async function getProfile(req, res) {
 async function updateProfile(req, res) {
     const userId = req.params.id;
 
-    const { firstname, lastname, about, birthday, phone, avatar, country } = req.body;
-    const country_code = country ? (country.code || null) : null;
+    const { firstname, lastname, about, birthday, phone, avatar, city } = req.body;
+    const city_id = city ? (city.id || null) : null;
 
     const user = await Database.instance.connection.any(`SELECT * FROM public.user WHERE id = $1`, [userId]);
 
@@ -125,9 +125,9 @@ async function updateProfile(req, res) {
 
     const data = await Database.instance.connection.any(`
         UPDATE public.user_profile
-        SET firstname = $1, lastname = $2, about = $3, birthday = $4, phone = $5, avatar = $6, country_code = $7
+        SET firstname = $1, lastname = $2, about = $3, birthday = $4, phone = $5, avatar = $6, city_id = $7
         WHERE user_id = $8
-    `, [firstname, lastname, about, birthday, phone, avatar, country_code, userId]);
+    `, [firstname, lastname, about, birthday, phone, avatar, city_id, userId]);
 
     return res.status(200).json({
         message: 'success',

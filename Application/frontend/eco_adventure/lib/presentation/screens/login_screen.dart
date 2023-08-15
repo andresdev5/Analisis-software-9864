@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:eco_adventure/presentation/models/auth_credential.dart';
 import 'package:eco_adventure/presentation/providers/auth_provider.dart';
@@ -29,40 +30,40 @@ class LoginScreen extends StatelessWidget {
               ),
               title: const Text(
                 'Sign in',
-                style: TextStyle(
-                    color: Color.fromARGB(255, 36, 170, 137),
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold),
+                style: TextStyle(color: Color.fromARGB(255, 36, 170, 137), fontSize: 18, fontWeight: FontWeight.bold),
               )),
           backgroundColor: Colors.transparent,
-          body: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.only(top: 50),
-            child: Column(
-              children: [
-                const Image(
-                  image: AssetImage('assets/logo.png'),
-                  width: 140,
-                ),
-                const SizedBox(height: 20),
-                Center(
-                    child: Text(
-                  'Eco Adventure',
-                  style: TextStyle(
-                      color: Colors.green[900],
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold),
-                )),
-                const SizedBox(height: 40),
-                const Padding(
-                  padding: EdgeInsets.all(48.0),
-                  child: Column(
-                    children: [
-                      _LoginForm(),
-                    ],
+          body: SingleChildScrollView(
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.only(top: 50),
+              child: Column(
+                children: [
+                  const Image(
+                    image: AssetImage('assets/logo.png'),
+                    width: 140,
                   ),
-                )
-              ],
+                  const SizedBox(height: 20),
+                  Center(
+                      child: Text(
+                    'Eco Adventure',
+                    style: TextStyle(color: Colors.green[900], fontSize: 28, fontWeight: FontWeight.bold),
+                  )),
+                  const SizedBox(height: 40),
+                  Padding(
+                    padding: const EdgeInsets.all(48.0),
+                    child: Column(
+                      children: [
+                        _LoginForm(
+                          onLoggedIn: () {
+                            context.goNamed('home');
+                          },
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         ));
@@ -70,7 +71,11 @@ class LoginScreen extends StatelessWidget {
 }
 
 class _LoginForm extends StatefulWidget {
-  const _LoginForm({Key? key}) : super(key: key);
+  final Function() onLoggedIn;
+  const _LoginForm({
+    Key? key,
+    required this.onLoggedIn,
+  }) : super(key: key);
 
   @override
   State<_LoginForm> createState() => _LoginFormState();
@@ -84,15 +89,16 @@ class _LoginFormState extends State<_LoginForm> {
   Future<void> login(BuildContext context, String username, String password) async {
     try {
       var authProvider = context.read<AuthProvider>();
-      var loggedIn = await authProvider
-          .login(AuthCredential(username: username, password: password));
+      var loggedIn = await authProvider.login(AuthCredential(username: username, password: password));
 
       if (loggedIn) {
-        context.replace('/home');
+        widget.onLoggedIn();
       } else {
         throw Exception('Invalid credentials');
       }
-    } catch (e) {
+    } catch (e, s) {
+      log(e.toString());
+      log(s.toString());
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString())),
       );
@@ -164,10 +170,7 @@ class _LoginFormState extends State<_LoginForm> {
               },
               child: const Text(
                 'Sign in',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold),
+                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
           ),

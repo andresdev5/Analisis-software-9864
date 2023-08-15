@@ -29,7 +29,7 @@ class UserProfile {
       about: data['about'],
       phone: data['phone'],
       birthday: data['birthday'] != null ? DateTime.parse(data['birthday']) : null,
-      country: data['country'] != null ? Country(code: data['country']['code'], name: data['country']['name']) : null,
+      city: data['city'] != null ? City(id: data['city']['id'], name: data['city']['name']) : null,
     );
   }
 }

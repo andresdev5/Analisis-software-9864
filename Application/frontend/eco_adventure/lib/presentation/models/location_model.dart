@@ -30,18 +30,20 @@ class Country {
 
 class City {
   int? id;
-  String? code;
   String? name;
 
   City({
     this.id,
-    this.code,
     this.name,
   });
 
   static fromJson(data) => City(
         id: data['id'],
-        code: data['code'],
         name: data['name'],
       );
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+  };
 }

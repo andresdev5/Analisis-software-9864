@@ -7,20 +7,24 @@ import 'dart:convert';
 
 class UserProvider with ChangeNotifier {
   AuthProvider? authProvider;
+  UserProfile? _profile;
 
   UserProvider({this.authProvider});
 
+  UserProfile? get profile => _profile;
+
   Future<UserProfile> getProfile() async {
-    var response = await http.get(Uri.parse('${Config.apiURL}/user/profile'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer ${authProvider?.token ?? ''}',
-        });
+    var response = await http.get(Uri.parse('${Config.apiURL}/user/profile'), headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer ${authProvider?.token ?? ''}',
+    });
 
     var data = jsonDecode(response.body)['data'];
 
     if (response.statusCode != 200) throw Exception(data['message']);
-    return UserProfile.fromJson(data['profile']);
+    final fetched = UserProfile.fromJson(data['profile']);
+    _profile = fetched;
+    return _profile!;
   }
 
   Future<void> updateProfile(int userId, UserProfile profile) async {
@@ -37,8 +41,7 @@ class UserProvider with ChangeNotifier {
         'about': profile.about,
         'phone': profile.phone,
         'birthday': profile.birthday?.toIso8601String(),
-        'country': profile.country?.toJson(),
-        'city': profile.city?.id,
+        'city': profile.city?.toJson(),
       }),
     );
 

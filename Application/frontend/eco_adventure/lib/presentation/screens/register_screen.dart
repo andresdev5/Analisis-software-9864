@@ -36,30 +36,34 @@ class RegisterScreen extends StatelessWidget {
                     fontWeight: FontWeight.bold),
               )),
           backgroundColor: Colors.transparent,
-          body: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.only(top: 20),
-            child: Column(
-              children: [
-                const Image(
-                  image: AssetImage('assets/logo.png'),
-                  width: 80,
-                ),
-                const SizedBox(height: 20),
-                Center(
-                    child: Text(
-                  'Eco Adventure',
-                  style: TextStyle(
-                      color: Colors.green[900],
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold),
-                )),
-                const SizedBox(height: 20),
-                const Padding(
-                    padding: EdgeInsets.only(
-                        left: 48.0, right: 48.0, top: 12, bottom: 5),
-                    child: _RegisterForm())
-              ],
+          body: SingleChildScrollView(
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.only(top: 20),
+              child: Column(
+                children: [
+                  const Image(
+                    image: AssetImage('assets/logo.png'),
+                    width: 80,
+                  ),
+                  const SizedBox(height: 20),
+                  Center(
+                      child: Text(
+                    'Eco Adventure',
+                    style: TextStyle(
+                        color: Colors.green[900],
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold),
+                  )),
+                  const SizedBox(height: 20),
+                  Padding(
+                      padding: const EdgeInsets.only(
+                          left: 48.0, right: 48.0, top: 12, bottom: 5),
+                      child: _RegisterForm(
+                        onRegistered: () {},
+                      ))
+                ],
+              ),
             ),
           ),
         ));
@@ -67,7 +71,12 @@ class RegisterScreen extends StatelessWidget {
 }
 
 class _RegisterForm extends StatefulWidget {
-  const _RegisterForm({Key? key}) : super(key: key);
+  final Function() onRegistered;
+
+  const _RegisterForm({
+    Key? key,
+    required this.onRegistered,
+  }) : super(key: key);
 
   @override
   State<_RegisterForm> createState() => _RegisterFormState();

@@ -24,7 +24,15 @@ class User {
       id: data['id'],
       username: data['username'],
       email: data['email'],
-      role: Role.fromJson(data['role']),
+      role: data['role'] != null ? Role.fromJson(data['role']) : null,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'username': username,
+        'email': email,
+        'password': password,
+        'role': role?.toJson(),
+      };
 }

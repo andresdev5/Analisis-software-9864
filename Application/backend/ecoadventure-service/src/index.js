@@ -65,6 +65,8 @@ app.use((req, res, next) => {
 app.use('/auth', require('./routes/auth.route'));
 app.use('/user', require('./routes/user.route'));
 app.use('/location', require('./routes/location.route'));
+app.use('/destination', require('./routes/destination.route'));
+app.use('/travel', require('./routes/travel.route'));
 
 async function main() {
     const connected = await Database.instance.connect();

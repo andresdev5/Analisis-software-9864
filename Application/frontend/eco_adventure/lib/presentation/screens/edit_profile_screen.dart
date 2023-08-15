@@ -1,9 +1,13 @@
+import 'dart:developer';
+import 'package:collection/collection.dart';
+
 import 'package:eco_adventure/presentation/models/location_model.dart';
 import 'package:eco_adventure/presentation/models/user_model.dart';
 import 'package:eco_adventure/presentation/models/user_profile.dart';
 import 'package:eco_adventure/presentation/providers/auth_provider.dart';
 import 'package:eco_adventure/presentation/providers/location_provider.dart';
 import 'package:eco_adventure/presentation/providers/user_provider.dart';
+import 'package:eco_adventure/presentation/widgets/default.layout.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -23,32 +27,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   _EditProfileForm? _editProfileFormWidget;
   final _globalKey = GlobalKey<_EditProfileFormState>();
 
-  void _onItemTapped(BuildContext context, int index) {
-    context.read<UserProvider>().getProfile();
-    if (index == 0) {
-      context.go('/home');
-    } else if (index == 5) {
-      context.read<AuthProvider>().logout();
-    }
-  }
-
   Future _saveProfile() async {
     var firstname = _globalKey.currentState?._firstname.text;
     var lastname = _globalKey.currentState?._lastname.text;
     var phone = _globalKey.currentState?._phone.text;
     var about = _globalKey.currentState?._about.text;
     var birthday = _globalKey.currentState?._birthday;
-    var country = _globalKey.currentState?._country;
+    var city = _globalKey.currentState?._currentCity;
 
     User user = Provider.of<AuthProvider>(context, listen: false).user!;
-    await Provider.of<UserProvider>(context, listen: false).updateProfile(user.id!, UserProfile(
-      firstname: firstname,
-      lastname: lastname,
-      phone: phone,
-      about: about,
-      birthday: birthday,
-      country: country,
-    ));
+    await Provider.of<UserProvider>(context, listen: false).updateProfile(
+        user.id!,
+        UserProfile(
+          firstname: firstname,
+          lastname: lastname,
+          phone: phone,
+          about: about,
+          birthday: birthday,
+          city: city,
+        ));
 
     // show snackbar
     ScaffoldMessenger.of(context).showSnackBar(
@@ -57,17 +54,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ),
     );
 
-    context.go('/profile');
+    context.pushNamed('profile');
   }
 
   @override
   Widget build(BuildContext context) {
     var user = context.watch<AuthProvider>().user;
-    context.read<UserProvider>().getProfile();
 
-    return Scaffold(
+    return DefaultLayout(
       backgroundColor: const Color.fromARGB(255, 245, 245, 245),
-      body: FutureBuilder<UserProfile>(
+      child: FutureBuilder<UserProfile>(
           future: context.read<UserProvider>().getProfile(),
           builder: (BuildContext context, AsyncSnapshot<UserProfile> snapshot) {
             var profile = snapshot.data;
@@ -79,13 +75,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             );
 
             if (snapshot.connectionState == ConnectionState.done) {
-              return Column(
+              return SingleChildScrollView(child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(flex: 1, child: _TopPortion(onSave: _saveProfile)),
-                  Expanded(
-                    flex: 3,
-                    child: Padding(
+                  SizedBox(height: 190, child: _TopPortion(onSave: _saveProfile)),
+                  IntrinsicHeight(child:Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,63 +87,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           Container(
                             margin: const EdgeInsets.only(left: 25),
                             child: Text(
-                              (profile?.firstname ?? (user?.username ?? '')),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge
-                                  ?.copyWith(fontWeight: FontWeight.w900),
+                              (profile.firstname ?? (user.username)),
+                              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
                             ),
                           ),
                           const SizedBox(height: 16),
                           Container(
-                            padding: const EdgeInsets.all(25),
-                            // form edit profile
-                            child: _editProfileFormWidget,
-                          )
+                              padding: const EdgeInsets.all(25),
+                              // form edit profile
+                              child: SingleChildScrollView(
+                                child: _editProfileFormWidget,
+                              ))
                         ],
-                      ),
-                    ),
+                      )),
                   ),
                 ],
-              );
+              ));
             } else {
               return const Center(child: CircularProgressIndicator());
             }
           }),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-            backgroundColor: Color.fromARGB(255, 219, 226, 228),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.place),
-            label: 'Places',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.event),
-            label: 'Activities',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: 'Profile',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.logout),
-            label: 'Logout',
-          ),
-        ],
-        currentIndex: 4,
-        selectedItemColor: const Color.fromARGB(255, 22, 160, 133),
-        unselectedItemColor: const Color.fromARGB(255, 48, 54, 63),
-        onTap: (index) => _onItemTapped(context, index),
-        selectedLabelStyle: const TextStyle(fontSize: 14),
-      ),
     );
   }
 }
@@ -170,10 +127,7 @@ class _TopPortion extends StatelessWidget {
               gradient: LinearGradient(
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
-                  colors: [
-                    Color.fromARGB(215, 22, 160, 133),
-                    Color.fromARGB(255, 22, 160, 133)
-                  ]),
+                  colors: [Color.fromARGB(215, 22, 160, 133), Color.fromARGB(255, 22, 160, 133)]),
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(0),
                 bottomRight: Radius.circular(0),
@@ -193,12 +147,9 @@ class _TopPortion extends StatelessWidget {
                     color: Colors.black,
                     boxShadow: null,
                     shape: BoxShape.circle,
-                    border: Border.all(
-                        color: const Color.fromARGB(255, 245, 245, 245),
-                        width: 5),
+                    border: Border.all(color: const Color.fromARGB(255, 245, 245, 245), width: 5),
                     image: const DecorationImage(
-                        fit: BoxFit.cover,
-                        image: NetworkImage('https://i.imgur.com/N0zWv1L.png')),
+                        fit: BoxFit.cover, image: NetworkImage('https://i.imgur.com/N0zWv1L.png')),
                   ),
                 ),
               ],
@@ -227,8 +178,7 @@ class _EditProfileForm extends StatefulWidget {
   User _user;
   UserProfile _profile;
 
-  _EditProfileForm(this.context, this._user, this._profile, {Key? key})
-      : super(key: key);
+  _EditProfileForm(this.context, this._user, this._profile, {Key? key}) : super(key: key);
 
   final BuildContext context;
 
@@ -237,7 +187,7 @@ class _EditProfileForm extends StatefulWidget {
 }
 
 class _EditProfileFormState extends State<_EditProfileForm> {
-  List _countriesList = [];
+  List<City> _citiesList = [];
 
   final _formKey = GlobalKey<FormState>();
   final _firstname = TextEditingController();
@@ -245,25 +195,23 @@ class _EditProfileFormState extends State<_EditProfileForm> {
   final _phone = TextEditingController();
   final _about = TextEditingController();
   DateTime _birthday = DateTime.now();
-  Country? _country;
+  City? _city;
+  City? _currentCity;
 
-  Future getAllCountries() async {
-    var data = await widget.context.read<LocationProvider>().getAllCountries();
-    var countries = [];
+  Future<void> getAllCities() async {
+    var data = await widget.context.read<LocationProvider>().getAllCities();
 
-    for (var country in data) {
-      //countries.add(Country(code: country.code, name: country.name));
+    for (var city in data) {
+      _citiesList.add(city);
     }
 
-    setState(() {
-      _countriesList = countries;
-    });
+    setState(() {});
   }
 
   @override
   void initState() {
     super.initState();
-    getAllCountries();
+    getAllCities();
   }
 
   @override
@@ -273,7 +221,11 @@ class _EditProfileFormState extends State<_EditProfileForm> {
     _phone.text = widget._profile.phone ?? '';
     _about.text = widget._profile.about ?? '';
     _birthday = widget._profile.birthday ?? DateTime.now();
-    _country = widget._profile.country;
+    _city = _citiesList.firstWhereOrNull((element) => element.id == widget._profile.city?.id);
+
+    if (_city != null) {
+      _currentCity = _city;
+    }
 
     return Form(
         key: _formKey,
@@ -314,8 +266,7 @@ class _EditProfileFormState extends State<_EditProfileForm> {
             const SizedBox(height: 16),
             // bithday date picker
             TextFormField(
-              controller: TextEditingController(
-                  text: DateFormat('dd-MM-yyyy').format(_birthday)),
+              controller: TextEditingController(text: DateFormat('dd-MM-yyyy').format(_birthday)),
               decoration: const InputDecoration(
                 labelText: 'Birthday',
                 labelStyle: TextStyle(color: Colors.black),
@@ -352,22 +303,23 @@ class _EditProfileFormState extends State<_EditProfileForm> {
             // dropdown country
             DropdownButtonFormField(
               decoration: const InputDecoration(
-                labelText: 'Country',
+                labelText: 'City',
                 labelStyle: TextStyle(color: Colors.black),
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(color: Colors.black),
                 ),
               ),
-              value: _country,
+              value: _city,
               onChanged: (dynamic value) {
-                setState(() => _country = value);
+                setState(() => _city = _currentCity = value);
               },
-              items: _countriesList.map((country) {
-                return DropdownMenuItem(
-                  value: country,
-                  child: Text(country.name),
-                );
-              }).toList(),
+              items: [
+                for (var city in _citiesList)
+                  DropdownMenuItem(
+                    value: city,
+                    child: Text(city.name ?? ''),
+                  )
+              ],
             ),
           ],
         ));

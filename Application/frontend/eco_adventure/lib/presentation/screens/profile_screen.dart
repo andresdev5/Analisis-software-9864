@@ -1,13 +1,11 @@
-import 'package:eco_adventure/presentation/models/user_model.dart';
 import 'package:eco_adventure/presentation/models/user_profile.dart';
 import 'package:eco_adventure/presentation/providers/auth_provider.dart';
 import 'package:eco_adventure/presentation/providers/user_provider.dart';
+import 'package:eco_adventure/presentation/widgets/default.layout.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:flutter_map/flutter_map.dart';
 import 'package:intl/intl.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -18,24 +16,21 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  void _onItemTapped(BuildContext context, int index) {
+  @override
+  void initState() {
+    super.initState();
     context.read<UserProvider>().getProfile();
-    if (index == 0) {
-      context.go('/home');
-    } else if (index == 5) {
-      context.read<AuthProvider>().logout();
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     var user = context.watch<AuthProvider>().user;
-    context.read<UserProvider>().getProfile();
+    //final profile = context.watch<UserProvider>().profile;
+    Provider.of<UserProvider>(context, listen: false).getProfile();
 
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 245, 245, 245),
-      body: FutureBuilder<UserProfile>(
-          future: context.read<UserProvider>().getProfile(),
+    return DefaultLayout(
+      child: FutureBuilder<UserProfile>(
+          future: context.watch<UserProvider>().getProfile(),
           builder: (BuildContext context, AsyncSnapshot<UserProfile> snapshot) {
             var profile = snapshot.data;
 
@@ -245,7 +240,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               ),
                                               const SizedBox(width: 16),
                                               Text(
-                                                (profile?.country?.name ?? '-'),
+                                                (profile?.city?.name ?? '-'),
                                                 style: const TextStyle(
                                                     fontSize: 16,
                                                     color: Colors.black),
@@ -310,40 +305,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               return const Center(child: CircularProgressIndicator());
             }
           }),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-            backgroundColor: Color.fromARGB(255, 219, 226, 228),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.place),
-            label: 'Places',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.event),
-            label: 'Activities',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: 'Profile',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.logout),
-            label: 'Logout',
-          ),
-        ],
-        currentIndex: 4,
-        selectedItemColor: const Color.fromARGB(255, 22, 160, 133),
-        unselectedItemColor: const Color.fromARGB(255, 48, 54, 63),
-        onTap: (index) => _onItemTapped(context, index),
-        selectedLabelStyle: const TextStyle(fontSize: 14),
-      ),
     );
   }
 }
@@ -406,7 +367,7 @@ class _TopPortion extends StatelessWidget {
                 PopupMenuItem(
                   child: TextButton(
                     onPressed: () {
-                      context.go('/profile-edit');
+                      context.goNamed('profile-edit');
                     },
                     child: const Text('Edit Profile', style: TextStyle(color: Colors.black)),
                   ),
